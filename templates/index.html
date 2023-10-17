@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MapQuest Directions</title>
+</head>
+<body>
+    <h1>Get Directions</h1>
+    <form id="directions-form">
+        <label for="source">Source City:</label>
+        <input type="text" name="source" id="source" required>
+        <br>
+        <label for="destination">Your Destination:</label>
+        <input type="text" name="destination" id="destination" required>
+        <br>
+        <label for="unit">Choose unit:</label>
+        <select name="unit" id="unit">
+            <option value="km">KM</option>
+            <option value="yd">YD</option>
+            <option value="mi">Miles</option>
+        </select>
+        <br>
+        <label for="path">Choose path:</label>
+        <select name="path" id="path">
+            <option value="fastest">Fastest Path</option>
+            <option value="shortest">Shortest Path</option>
+            <option value="walking">Walking path</option>
+        </select>
+        <br>
+        <label for="avoid">Choose what to avoid:</label>
+        <input type="checkbox" name="avoid" value="highways"> Highways
+        <input type="checkbox" name="avoid" value="bridge"> Bridge
+        <input type="checkbox" name="avoid" value="tunnel"> Tunnel
+        <input type="checkbox" name="avoid" value="streets"> Streets
+        <br>
+        <button type="button" onclick="getDirections()">Get Directions</button>
+    </form>
+    <div id="directions-result"></div>
+
+<script>
+    function getDirections() {
+        var source = document.getElementById("source").value;
+        var destination = document.getElementById("destination").value;
+        var unit = document.getElementById("unit").value;
+        var path = document.getElementById("path").value;
+        var avoids = [];
+        var checkboxes = document.querySelectorAll('input[name="avoid"]:checked');
+        checkboxes.forEach(function(checkbox) {
+            avoids.push(checkbox.value);
+        });
+
+        // Send these values to your Flask server via an AJAX request
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "/get_directions", true);
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                var response = JSON.parse(xhr.responseText);
+                displayRoute(response.route);
+            }
+        };
+        xhr.send("source=" + source + "&destination=" + destination + "&unit=" + unit + "&path=" + path + "&avoid=" + avoids.join(","));
+    }
+
+    function displayRoute(route) {
+        var resultDiv = document.getElementById("directions-result");
+        resultDiv.innerHTML = "";
+
+        var legs = route.legs;
+        for (var i = 0; i < legs.length; i++) {
+            var leg = legs[i];
+            var maneuvers = leg.maneuvers;
+            for (var j = 0; j < maneuvers.length; j++) {
+                var maneuver = maneuvers[j];
+                var narrative = maneuver.narrative;
+
+                // Display each turn-by-turn direction
+                var directionDiv = document.createElement("div");
+                directionDiv.textContent = narrative;
+                resultDiv.appendChild(directionDiv);
+            }
+        }
+    }
+</script>
+
+</body>
+</html>
+
