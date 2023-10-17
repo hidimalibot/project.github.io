@@ -6,6 +6,17 @@
 </head>
 <body>
     <h1>Directions</h1>
-    <!-- Display the directions and other information from the MapQuest API response here -->
+    <p>Arrival Time: {{ data.route.formattedTime }}</p>
+    <p>Kilometers: {{ data.route.distance * 1.61 }}</p>
+    <p>Miles: {{ data.route.distance }}</p>
+    <p>Yards: {{ data.route.distance * 1760 }}</p>
+    <p>Fuel Used(ltr): {{ data.route.distance * 3.78 }}</p>
+    <p>Fuel Used(Imperial Gal): {{ data.route.distance * 0.8327 }}</p>
+    
+    <ul>
+        {% for maneuver in data.route.legs[0].maneuvers %}
+            <li>{{ maneuver.narrative }} ({{ maneuver.distance * 1.61 }} km)</li>
+        {% endfor %}
+    </ul>
 </body>
 </html>
