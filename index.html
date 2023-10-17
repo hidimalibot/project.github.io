@@ -6,14 +6,33 @@
 </head>
 <body>
     <h1>Get Directions</h1>
-    <form action="/get_directions" method="post">
+    <form id="directions-form">
         <label for="source">Source City:</label>
         <input type="text" name="source" id="source" required>
         <br>
         <label for="destination">Your Destination:</label>
         <input type="text" name="destination" id="destination" required>
         <br>
-        <button type="submit">Get Directions</button>
+        <button type="button" onclick="getDirections()">Get Directions</button>
     </form>
+    <div id="directions-result"></div>
+    
+    <script>
+        function getDirections() {
+            var source = document.getElementById("source").value;
+            var destination = document.getElementById("destination").value;
+
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "/get_directions", true);
+            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    var resultDiv = document.getElementById("directions-result");
+                    resultDiv.innerHTML = xhr.responseText;
+                }
+            };
+            xhr.send("source=" + source + "&destination=" + destination);
+        }
+    </script>
 </body>
 </html>
